@@ -41,10 +41,14 @@ export function useWallet() {
         return;
       }
 
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      const chainId = await ethereum.request({ method: 'eth_chainId' });
+      // Fix type issues with eth_requestAccounts response
+      const accountsResult = await ethereum.request({ method: 'eth_requestAccounts' });
+      const accounts = accountsResult as string[];
       
-      if (accounts.length === 0) return;
+      if (!accounts || accounts.length === 0) return;
+      
+      const chainIdResult = await ethereum.request({ method: 'eth_chainId' });
+      const chainId = chainIdResult as string;
       
       const provider = new ethers.BrowserProvider(ethereum);
       const signer = await provider.getSigner();
@@ -94,8 +98,11 @@ export function useWallet() {
       try {
         const ethereum = METAMASK_SDK.getProvider();
         if (ethereum) {
-          const accounts = await ethereum.request({ method: 'eth_accounts' });
-          if (accounts.length > 0) {
+          // Fix type issues with eth_accounts response
+          const accountsResult = await ethereum.request({ method: 'eth_accounts' });
+          const accounts = accountsResult as string[];
+          
+          if (accounts && accounts.length > 0) {
             connectWallet();
           }
         }
