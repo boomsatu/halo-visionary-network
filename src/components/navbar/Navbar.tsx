@@ -1,12 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useWallet } from "@/hooks/use-wallet";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const { isConnected, account, connectWallet, disconnectWallet, formatAddress } = useWallet();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,12 +43,12 @@ const Navbar = () => {
             to="/"
             className="text-xl font-medium tracking-tighter text-primary"
           >
-            HALO
+            HALO DEX
           </Link>
         </div>
 
         <nav className="hidden md:flex items-center space-x-8">
-          {["Vision", "Features", "Connect"].map((item) => (
+          {["Swap", "Pool", "Charts"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -55,12 +57,19 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <a
-            href="#contact"
-            className="text-sm font-medium bg-primary text-white px-5 py-2.5 rounded-full hover:bg-primary/90 transition-all duration-300"
+          
+          <button
+            onClick={isConnected ? disconnectWallet : connectWallet}
+            className={cn(
+              "flex items-center gap-2 text-sm font-medium px-5 py-2.5 rounded-full transition-all duration-300",
+              isConnected 
+                ? "bg-green-100 text-green-800 hover:bg-green-200" 
+                : "bg-primary text-white hover:bg-primary/90"
+            )}
           >
-            Join Network
-          </a>
+            <Wallet className="h-4 w-4" />
+            {isConnected ? formatAddress(account!) : "Connect Wallet"}
+          </button>
         </nav>
 
         <button
@@ -84,7 +93,7 @@ const Navbar = () => {
         )}
       >
         <nav className="flex flex-col space-y-8 mt-8">
-          {["Vision", "Features", "Connect"].map((item) => (
+          {["Swap", "Pool", "Charts"].map((item) => (
             <a
               key={item}
               href={`#${item.toLowerCase()}`}
@@ -97,16 +106,22 @@ const Navbar = () => {
               {item}
             </a>
           ))}
-          <a
-            href="#contact"
-            className="text-xl font-medium bg-primary text-white px-5 py-3 rounded-full text-center"
+          <button
             onClick={() => {
+              isConnected ? disconnectWallet() : connectWallet();
               setIsOpen(false);
               document.body.style.overflow = "";
             }}
+            className={cn(
+              "flex items-center justify-center gap-2 text-xl font-medium px-5 py-3 rounded-full",
+              isConnected 
+                ? "bg-green-100 text-green-800" 
+                : "bg-primary text-white"
+            )}
           >
-            Join Network
-          </a>
+            <Wallet className="h-5 w-5" />
+            {isConnected ? formatAddress(account!) : "Connect Wallet"}
+          </button>
         </nav>
       </div>
     </header>
